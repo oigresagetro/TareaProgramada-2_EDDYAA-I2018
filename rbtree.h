@@ -1,5 +1,6 @@
 #ifndef RED_BLACK_rbtree
 #define RED_BLACK_rbtree
+#include <iostream>
 #include <stack>
 using namespace std;
 enum colors {RED, BLACK};
@@ -38,8 +39,8 @@ template <typename T>
 class rbtree{
 	public:
 		rbtree(){
-		    this->root = NULL;
-		    this-> nil = NULL;
+		    this->root = this->nil;
+
 		};
 			// Constructor (crea un arbol vacio)
 
@@ -52,7 +53,7 @@ class rbtree{
 			// Destructor (borra el arbol)
 
 		void inorderTreeWalk(rbnode<T>* x, stack<T> & pila){
-		    if(x != NULL){
+		    if(x != this->nil){
             inorderTreeWalk(x->left, pila);
             pila.push(x->key);
             if(x->color == RED){
@@ -197,83 +198,85 @@ class rbtree{
             return nod;
 		};
 
-        void leftRotate(rbnode<T>* x){
-            rbnode<T> * y = x->right;
-            x->right = y->left;
-            if(y->left != this->nil){
-                y->left->p = x;
-            }
-            y->p = x->p;
-            if(x->p == this->nil){
-                this->root = y;
-            }else{
-                if(x == x->p->left){
-                    x->p->left = y;
-                }else{
-                    x->p->right = y;
-                }
-            }
-            y->left = x;
-            x->p = y;
+void leftRotate(rbnode<T>* x){
+    rbnode<T> * y = x->right;
+    x->right = y->left;
+    if(y->left != this->nil){
+        y->left->p = x;
+    }
+    y->p = x->p;
+    if(x->p == this->nil){
+        this->root = y;
+    }else{
+        if(x == x->p->left){
+            x->p->left = y;
+        }else{
+            x->p->right = y;
+        }
+    }
+    y->left = x;
+    x->p = y;
 
-        };
+};
 
-        void rightRotate(rbnode<T>* x){
-            rbnode<T>* y = x->left;
-            x->left = y->right;
-            if(y->right != this->nil){
-                y->right->p = x;
-            }
-            y->p = x->p;
-            if(x->p == this->nil){
-                this->root = y;
-            }else{
-                if(x == x->p->right){
-                    x->p->right = y;
-                }else{
-                    x->p->left = y;
-                }
-            }
-            y->right = x;
-            x->p = y;
+void rightRotate(rbnode<T>* x){
+    rbnode<T>* y = x->left;
+    x->left = y->right;
+    if(y->right != this->nil){
+        y->right->p = x;
+    }
+    y->p = x->p;
+    if(x->p == this->nil){
+        this->root = y;
+    }else{
+        if(x == x->p->right){
+            x->p->right = y;
+        }else{
+            x->p->left = y;
+        }
+    }
+    y->right = x;
+    x->p = y;
 
-        };
+};
 
 void insertFix(rbnode<T>* node){
-    while(node->p->color == RED){
-      if(node->p == node->p->p->left){
-        rbnode<T>* y = node->p->p->right;
-        if(y->color == RED){
-          node->p->color = BLACK;
-          y->color = BLACK;
-          node->p->p->color = RED;
-          node = node->p->p;
-        }else{
-          if(node == node->p->right){
-            node = node->p;
-            leftRotate(node);
-          }
-          node->p->color = BLACK;
-          node->p->p->color = RED;
-          rightRotate(node->p->p);
+    if(node->p != this->nil){
+        while(node->p->color == RED){
+            if(node->p == node->p->p->left){
+                rbnode<T>* y = node->p->p->right;
+                if(y->color == RED){
+                  node->p->color = BLACK;
+                  y->color = BLACK;
+                  node->p->p->color = RED;
+                  node = node->p->p;
+                }else{
+                    if(node == node->p->right){
+                        node = node->p;
+                        leftRotate(node);
+                    }
+                    node->p->color = BLACK;
+                    node->p->p->color = RED;
+                    rightRotate(node->p->p);
+                }
+            }else{
+                rbnode<T>* y = node->p->p->left;
+                if(y->color == RED){
+                  node->p->color = BLACK;
+                  y->color = BLACK;
+                  node->p->p->color = RED;
+                  node = node->p->p;
+                }else{
+                  if(node == node->p->left){
+                    node = node->p;
+                    rightRotate(node);
+                  }
+                  node->p->color = BLACK;
+                  node->p->p->color = RED;
+                  leftRotate(node->p->p);
+                }
+            }
         }
-      }else{
-        rbnode<T>* y = node->p->p->left;
-        if(y->color == RED){
-          node->p->color = BLACK;
-          y->color = BLACK;
-          node->p->p->color = RED;
-          node = node->p->p;
-        }else{
-          if(node == node->p->left){
-            node = node->p;
-            leftRotate(node);
-          }
-          node->p->color = BLACK;
-          node->p->p->color = RED;
-          rightRotate(node->p->p);
-        }
-      }
     }
     root->color = BLACK;
 };
